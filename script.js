@@ -3,6 +3,7 @@ const text = document.getElementById('text');
 const scoreEl = document.getElementById('score');
 const timeEl = document.getElementById('time');
 const endgameEl = document.getElementById('end-game-container');
+const endgameScore = endgameEl.querySelector('#end-game-score');
 const settingsBtn = document.getElementById('settings-btn');
 const settings = document.getElementById('settings');
 const settingsForm = document.getElementById('settings-form');
@@ -45,9 +46,9 @@ let score = 0;
 // Init time 
 let time = 10; 
 
+
 // Focus on text on start
 text.focus();
-
 
 
 
@@ -73,7 +74,6 @@ function updateScore() {
 }
 
 
-
 // Start counting down: the function get called every 1 second
 const timeInterval = setInterval(updateTime, 1000);
 
@@ -94,18 +94,21 @@ function updateTime() {
 // Game over & show end screen
 function gameOver() {
     endgameEl.style.display = 'flex'; 
-    endgameEl.innerHTML = `
-    <h1>Time ran out</h1>
-    <p>Your final score is ${score}</p>
-    <button onclick="location.reload()">Reload</button>
-    `;
+    endgameScore.innerText = `Your final score is ${score}`;
 }
 
 
+// Set difficulty to value in localStorage or easy
+let difficulty = localStorage.getItem('difficulty') !== null ? JSON.parse(localStorage.getItem('difficulty')) : 'easy';
 
+
+// Display difficulty select to DOM
+difficultySelect.value = `${difficulty}`;
 
 
 // Event listeners
+
+// Typing
 text.addEventListener('input', (e) => {
     const insertedText = e.target.value;
 
@@ -116,9 +119,27 @@ text.addEventListener('input', (e) => {
         // clear the input value
         e.target.value = '';
 
-        time += 5; 
+        if (difficulty === 'easy') {
+            time += 5;
+        } else if (difficulty === 'Medium') {
+            time += 3; 
+        } else {
+            time += 1; 
+        }
         
         updateTime();
     } 
-
 });
+
+
+// Settings btn click
+settingsBtn.addEventListener('click', () => {
+    settings.classList.toggle('hide');
+});
+
+
+// Settings difficulty select
+settingsForm.addEventListener('change', (e) => {
+    difficulty = e.target.value;
+    localStorage.setItem('difficulty', JSON.stringify(difficulty));
+} );
